@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Subscriptions struct {
+type Subscription struct {
 	ID          uuid.UUID
 	ServiceName string
 	Price       int

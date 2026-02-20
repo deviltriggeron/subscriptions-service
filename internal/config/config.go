@@ -3,10 +3,11 @@ package config
 import (
 	"log"
 	"os"
-	"subscriptions-service/internal/domain"
 	"sync"
 
 	"github.com/joho/godotenv"
+
+	"subscriptions-service/internal/domain"
 )
 
 var once sync.Once
