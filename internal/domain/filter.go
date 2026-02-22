@@ -12,3 +12,10 @@ type SubscriptionFilter struct {
 	From        time.Time
 	To          time.Time
 }
+
+type TotalCostFilter struct {
+	UserID      *uuid.UUID
+	ServiceName *string
+	From        time.Time
+	To          time.Time
+}

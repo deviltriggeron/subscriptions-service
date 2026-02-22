@@ -61,7 +61,72 @@ func (r *repo) GetByID(ctx context.Context, id uuid.UUID) (*domain.Subscription,
 	return &sub, nil
 }
 
-func (r *repo) List(ctx context.Context, filter domain.SubscriptionFilter) (int64, error) {
+func (r *repo) List(ctx context.Context, filter domain.SubscriptionFilter) ([]domain.Subscription, error) {
+	query := `
+		SELECT
+			subscription_id,
+			service_name,
+			price,
+			user_id,
+			start_date,
+			end_date
+		FROM subscriptions
+		WHERE start_date < $1
+		  AND (end_date IS NULL OR end_date > $2)
+	`
+
+	args := []any{filter.To, filter.From}
+
+	if filter.UserID != nil {
+		query += fmt.Sprintf(" AND user_id = $%d", len(args)+1)
+		args = append(args, *filter.UserID)
+	}
+
+	if filter.ServiceName != nil {
+		query += fmt.Sprintf(" AND service_name ILIKE $%d", len(args)+1)
+		args = append(args, "%"+*filter.ServiceName+"%")
+	}
+
+	query += " ORDER BY start_date DESC"
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("list subscriptions: %w", err)
+	}
+	defer rows.Close()
+
+	var subs []domain.Subscription
+
+	for rows.Next() {
+		var sub domain.Subscription
+		var endDate sql.NullTime
+
+		if err := rows.Scan(
+			&sub.ID,
+			&sub.ServiceName,
+			&sub.Price,
+			&sub.UserID,
+			&sub.StartDate,
+			&endDate,
+		); err != nil {
+			return nil, fmt.Errorf("scan subscription: %w", err)
+		}
+
+		if endDate.Valid {
+			sub.EndDate = endDate.Time
+		}
+
+		subs = append(subs, sub)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return subs, nil
+}
+
+func (r *repo) TotalCost(ctx context.Context, filter domain.TotalCostFilter) (int64, error) {
 	query := `
 		SELECT COALESCE(SUM(price), 0)
 		FROM subscriptions
