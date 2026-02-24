@@ -103,7 +103,7 @@ func (r *repo) List(ctx context.Context, filter domain.SubscriptionFilter) ([]do
 
 		if err := rows.Scan(
 			&sub.ID,
-			&sub.ServiceName,
+			&sub.Servicename,
 			&sub.Price,
 			&sub.UserID,
 			&sub.StartDate,
@@ -126,12 +126,12 @@ func (r *repo) List(ctx context.Context, filter domain.SubscriptionFilter) ([]do
 	return subs, nil
 }
 
-func (r *repo) TotalCost(ctx context.Context, filter domain.TotalCostFilter) (int64, error) {
+func (r *repo) TotalCost(ctx context.Context, filter domain.SubscriptionFilter) (int64, error) {
 	query := `
 		SELECT COALESCE(SUM(price), 0)
 		FROM subscriptions
-		WHERE start_date < $1
-		  AND (end_date IS NULL OR end_date > $2)
+		WHERE start_date <= $1
+		  AND (end_date IS NULL OR end_date => $2)
 	`
 
 	args := []any{filter.To, filter.From}
@@ -168,7 +168,7 @@ func (r *repo) Update(ctx context.Context, sub domain.Subscription) error {
 	`
 
 	res, err := r.db.ExecContext(
-		ctx, q, sub.ServiceName, sub.Price, sub.UserID, sub.StartDate, sub.EndDate, sub.ID,
+		ctx, q, sub.Servicename, sub.Price, sub.UserID, sub.StartDate, sub.EndDate, sub.ID,
 	)
 	if err != nil {
 		return fmt.Errorf("error update subscription: %w", err)

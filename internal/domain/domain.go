@@ -8,7 +8,7 @@ import (
 
 type Subscription struct {
 	ID          uuid.UUID
-	ServiceName string
+	Servicename string
 	Price       int
 	UserID      uuid.UUID
 	StartDate   time.Time

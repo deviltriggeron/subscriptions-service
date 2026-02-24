@@ -9,13 +9,6 @@ import (
 type SubscriptionFilter struct {
 	UserID      *uuid.UUID
 	ServiceName *string
-	From        time.Time
-	To          time.Time
-}
-
-type TotalCostFilter struct {
-	UserID      *uuid.UUID
-	ServiceName *string
-	From        time.Time
-	To          time.Time
+	From        *time.Time
+	To          *time.Time
 }
