@@ -103,7 +103,7 @@ func (r *repo) List(ctx context.Context, filter domain.SubscriptionFilter) ([]do
 
 		if err := rows.Scan(
 			&sub.ID,
-			&sub.Servicename,
+			&sub.ServiceName,
 			&sub.Price,
 			&sub.UserID,
 			&sub.StartDate,
@@ -168,7 +168,7 @@ func (r *repo) Update(ctx context.Context, sub domain.Subscription) error {
 	`
 
 	res, err := r.db.ExecContext(
-		ctx, q, sub.Servicename, sub.Price, sub.UserID, sub.StartDate, sub.EndDate, sub.ID,
+		ctx, q, sub.ServiceName, sub.Price, sub.UserID, sub.StartDate, sub.EndDate, sub.ID,
 	)
 	if err != nil {
 		return fmt.Errorf("error update subscription: %w", err)

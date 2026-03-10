@@ -1,14 +1,14 @@
 package dto
 
 type CreateSubscriptionReq struct {
-	Servicename string `json:"service_name"`
+	ServiceName string `json:"service_name"`
 	Price       int    `json:"price"`
 	UserID      string `json:"user_id"`
 	StartDate   string `json:"start_date"`
 }
 
 type SubscriptionResp struct {
-	Servicename string `json:"service_name"`
+	ServiceName string `json:"service_name"`
 	Price       int    `json:"price"`
 	UserID      string `json:"user_id"`
 	StartDate   string `json:"start_date"`
@@ -16,7 +16,7 @@ type SubscriptionResp struct {
 }
 
 type UpdateSubscriptionReq struct {
-	Servicename *string `json:"service_name,omitempty"`
+	ServiceName *string `json:"service_name,omitempty"`
 	Price       *int    `json:"price,omitempty"`
 	StartDate   *string `json:"start_date,omitempty"`
 	EndDate     *string `json:"end_date,omitempty"`

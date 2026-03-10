@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,6 +28,14 @@ func (s *service) Create(ctx context.Context, req dto.CreateSubscriptionReq) (*d
 	sub, err := mapper.ReqToDomain(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if strings.TrimSpace(sub.ServiceName) == "" {
+		return nil, domain.ErrInvalidServiceName
+	}
+
+	if sub.Price < 0 {
+		return nil, domain.ErrInvalidPrice
 	}
 
 	sub.EndDate = getEndDate(sub.StartDate)

@@ -1,15 +1,17 @@
 package router
 
 import (
-	"subscriptions-service/internal/handler"
-
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/swaggo/swag/example/basic/docs"
+
+	"subscriptions-service/internal/handler"
+	"subscriptions-service/internal/middleware"
 )
 
 func NewRouter(handler *handler.Handler) *mux.Router {
 	r := mux.NewRouter()
+	r.Use(middleware.MiddlewareLogging)
 
 	v1 := r.PathPrefix("/api/v1").Subrouter()
 

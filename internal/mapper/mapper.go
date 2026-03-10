@@ -1,18 +1,19 @@
 package mapper
 
 import (
-	"subscriptions-service/internal/db"
-	"subscriptions-service/internal/domain"
-	"subscriptions-service/internal/dto"
 	"time"
 
 	"github.com/google/uuid"
+
+	"subscriptions-service/internal/db"
+	"subscriptions-service/internal/domain"
+	"subscriptions-service/internal/dto"
 )
 
 func DomainToModel(sub domain.Subscription) db.SubscriptionModel {
 	return db.SubscriptionModel{
 		ID:          sub.ID,
-		ServiceName: sub.Servicename,
+		ServiceName: sub.ServiceName,
 		Price:       sub.Price,
 		UserID:      sub.UserID,
 		StartDate:   sub.StartDate,
@@ -23,7 +24,7 @@ func DomainToModel(sub domain.Subscription) db.SubscriptionModel {
 func ModelToDomain(sub db.SubscriptionModel) domain.Subscription {
 	return domain.Subscription{
 		ID:          sub.ID,
-		Servicename: sub.ServiceName,
+		ServiceName: sub.ServiceName,
 		Price:       sub.Price,
 		UserID:      sub.UserID,
 		StartDate:   sub.StartDate,
@@ -34,16 +35,16 @@ func ModelToDomain(sub db.SubscriptionModel) domain.Subscription {
 func ReqToDomain(req dto.CreateSubscriptionReq) (*domain.Subscription, error) {
 	userID, err := uuid.Parse(req.UserID)
 	if err != nil {
-		return nil, err
+		return nil, ErrInvalidUUID
 	}
 
 	startDate, err := time.Parse("01-2006", req.StartDate)
 	if err != nil {
-		return nil, err
+		return nil, ErrInvalidStartDate
 	}
 
 	return &domain.Subscription{
-		Servicename: req.Servicename,
+		ServiceName: req.ServiceName,
 		Price:       req.Price,
 		UserID:      userID,
 		StartDate:   startDate,
@@ -52,8 +53,8 @@ func ReqToDomain(req dto.CreateSubscriptionReq) (*domain.Subscription, error) {
 
 func ReqUpdateToDomain(req dto.UpdateSubscriptionReq) (*domain.Subscription, error) {
 	var sub domain.Subscription
-	if req.Servicename != nil {
-		sub.Servicename = *req.Servicename
+	if req.ServiceName != nil {
+		sub.ServiceName = *req.ServiceName
 	}
 
 	if req.Price != nil {
@@ -63,7 +64,7 @@ func ReqUpdateToDomain(req dto.UpdateSubscriptionReq) (*domain.Subscription, err
 	if req.StartDate != nil {
 		t, err := time.Parse("01-2006", *req.StartDate)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidStartDate
 		}
 		sub.StartDate = t
 	}
@@ -71,7 +72,7 @@ func ReqUpdateToDomain(req dto.UpdateSubscriptionReq) (*domain.Subscription, err
 	if req.EndDate != nil {
 		t, err := time.Parse("01-2006", *req.EndDate)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidEndDate
 		}
 		sub.EndDate = t
 	}
@@ -89,7 +90,7 @@ func ReqFilterToDomain(req dto.CreateSubscriptionFilterReq) (*domain.Subscriptio
 	if req.UserID != nil {
 		userID, err := uuid.Parse(*req.UserID)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidUUID
 		}
 
 		filter.UserID = &userID
@@ -98,7 +99,7 @@ func ReqFilterToDomain(req dto.CreateSubscriptionFilterReq) (*domain.Subscriptio
 	if req.From != nil {
 		t, err := time.Parse("01-2006", *req.From)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidStartDate
 		}
 
 		filter.From = &t
@@ -107,11 +108,21 @@ func ReqFilterToDomain(req dto.CreateSubscriptionFilterReq) (*domain.Subscriptio
 	if req.To != nil {
 		t, err := time.Parse("01-2006", *req.To)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidEndDate
 		}
 
 		filter.To = &t
 	}
 
 	return &filter, nil
+}
+
+func DomainToResp(sub domain.Subscription) dto.SubscriptionResp {
+	return dto.SubscriptionResp{
+		ServiceName: sub.ServiceName,
+		Price:       sub.Price,
+		UserID:      sub.UserID.String(),
+		StartDate:   sub.StartDate.String(),
+		EndDate:     sub.EndDate.String(),
+	}
 }
